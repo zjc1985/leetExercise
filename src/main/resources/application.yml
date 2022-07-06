@@ -1,0 +1,12 @@
+spring:
+  profiles: local
+  application:
+    name: clickHouseTest  # Service registers under this name
+  jackson:
+    date-format: yyyy-MM-dd HH:mm:ss
+    time-zone: GMT+8
+  datasource:
+    url: jdbc:clickhouse://172.18.1.134:8123/time_seris_test
+    driverClassName: ru.yandex.clickhouse.ClickHouseDriver
+    username: default
+    password: ajdev
