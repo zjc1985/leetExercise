@@ -18,7 +18,7 @@ import java.util.Arrays;
  * <p>
  * 1 <= stones.length <= 30 1 <= stones[i] <= 1000 #
  */
-public class LastStoneWeight2 {
+public class Dp4_LastStoneWeight2 {
 
 
   public static void main(String[] args) {
@@ -26,6 +26,11 @@ public class LastStoneWeight2 {
     int[] stones = {2, 7, 4, 1, 8, 1};
     int value = new Solution().lastStoneWeightII(stones);
     System.out.println(value);
+
+    System.out.println("========");
+
+    int value2 = new Solution().lastStoneWeightIISolution2(stones);
+    System.out.println(value2);
   }
 
   static class Solution {
@@ -55,6 +60,60 @@ public class LastStoneWeight2 {
       }
 
       return sum - 2 * dp[cap];
+    }
+
+    /**
+     * 问题转化为分成两堆石头，差最小。差最小两堆石头重量都要接近于sum/2
+     * <p>
+     * 问题转化为将石头放进容量为sum/2的背包中，求其最大重量max。 解为 (sum-max)-max
+     * <p></>
+     * <p>
+     * dp[i][j]定义为在stones数组中选取前i个物品，放到容量为j的背包中的最大价值。
+     * <p></>
+     * 其中 0<= i < stones.length +1 ; 0 <= j < sum/2+1
+     * <p></>
+     * dp[i][j]=dp[i-1][j] if j < stones[i-1]
+     * <p></>
+     * dp[i][j] = Max {dp[i-1][j] , dp[i-1][j-stones[i-1]] } if j >= stones[i-1]
+     * <p></>
+     * <p>
+     * 初始化 : dp[0][j] = 0 ; dp[i][0] = 0;
+     *
+     * @param stones
+     * @return
+     */
+    public int lastStoneWeightIISolution2(int[] stones) {
+      int sum = 0;
+      for (int i = 0; i < stones.length; i++) {
+        sum = sum + stones[i];
+      }
+      int cap = sum / 2;
+
+      int[][] dp = new int[stones.length + 1][cap + 1];
+
+      for (int j = 0; j < cap + 1; j++) {
+        dp[0][j] = 0;
+      }
+
+      for (int i = 1; i < stones.length + 1; i++) {
+        for (int j = 0; j < cap + 1; j++) {
+          if (j - stones[i - 1] < 0) {
+            dp[i][j] = dp[i - 1][j];
+          } else {
+            dp[i][j] = Math.max(dp[i - 1][j], dp[i - 1][j - stones[i - 1]] + stones[i - 1]);
+          }
+        }
+      }
+
+      //打印dp数组
+      for (int i = 0; i < stones.length + 1; i++) {
+        for (int j = 0; j < cap + 1; j++) {
+          System.out.print(dp[i][j] + " ");
+        }
+        System.out.print("\n");
+      }
+
+      return sum - 2 * dp[stones.length][cap];
     }
 
   }

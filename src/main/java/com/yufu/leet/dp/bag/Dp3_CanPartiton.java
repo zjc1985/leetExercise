@@ -15,7 +15,7 @@ import java.util.Arrays;
  * <p>
  * 1 <= nums.length <= 200 1 <= nums[i] <= 100
  */
-public class CanPartiton {
+public class Dp3_CanPartiton {
 
   public static void main(String[] args) {
     int[] nums = {1, 5, 11, 5};
@@ -25,7 +25,7 @@ public class CanPartiton {
 
     new Solution().canPartition2(nums);
     System.out.println("====");
-    new Solution().canPartition2(nums2);
+    new Solution().canPartition3(nums);
 
   }
 
@@ -122,71 +122,65 @@ public class CanPartiton {
       return dp[nums.length - 1][target];
     }
 
-  }
+    /**
+     * 问题转为从nums中选择若干元素，是否可以使其和为target = sum/2
+     * <p>
+     * dp[i][j] 表示从 nums的前i个元素中选取若干，是否存在方案使得这若干元素的正整数和为j
+     * <p></>
+     * 0 <= i < lenght+1, 0<=j<target+1 求 dp[length][target]
+     * <p>
+     * dp[i][0]=true 0<=i<n  表示不选去任何正整数，使得和为0 方案存在
+     * <p></>
+     * dp[0][0]=true
+     * <p></>
+     * dp[0][j] = false j > 1
+     *
+     *
+     * <p>
+     * dp[i][j]= dp[i-1][j]                  j < nums[i-1]
+     * <p></>
+     * dp[i][j]= dp[i-1][j]  || dp[i-1][j-nums[i-1]] j>=nums[i-1]
+     *
+     * @param nums
+     * @return
+     */
+    public boolean canPartition3(int[] nums) {
+      int sum = 0;
+      for (int i = 0; i < nums.length; i++) {
+        sum = sum + nums[i];
+      }
 
-  /**
-   * 问题转为从nums中选择若干元素，是否可以使其和为sum/2
-   * <p>
-   * dp[i][j] 表示从 nums的前i个元素中选取若干，是否存在方案使得这若干元素的正整数和为j 0 <= i < n+1, 0<=j<target+1 求
-   * dp[n][target]
-   * <p>
-   * dp[i][0]=true 0<=i<n  表示不选去任何正整数，使得和为0 方案存在
-   * <p></>
-   * dp[0][nums[0]]=true
-   *
-   *
-   *
-   * <p>
-   * dp[i][j]= dp[i-1][j]                  j < nums[i]
-   * <p></>
-   * dp[i][j]= dp[i-1][j]  || dp[i-1][j-nums[i]] j>=nums[i]
-   *
-   * @param nums
-   * @return
-   */
-  public boolean canPartition3(int[] nums) {
-    int sum = 0;
-    for (int i = 0; i < nums.length; i++) {
-      sum = sum + nums[i];
-    }
+      if (sum % 2 == 1) {
+        return false;
+      }
 
-    if (sum % 2 == 1) {
-      return false;
-    }
+      int target = sum / 2;
 
-    int target = sum / 2;
+      boolean[][] dp = new boolean[nums.length + 1][target + 1];
 
-    boolean[][] dp = new boolean[nums.length][target + 1];
-
-    for (int i = 0; i < nums.length; i++) {
-      dp[i][0] = true;
-    }
-
-    for (int j = 1; j <= target; j++) {
-      if (j == nums[0]) {
-        dp[0][j] = true;
-      } else {
+      dp[0][0] = true;
+      for (int j = 1; j < target + 1; j++) {
         dp[0][j] = false;
       }
-    }
 
-    for (int i = 1; i < nums.length; i++) {
-      for (int j = 1; j <= target; j++) {
-        if (j < nums[i]) {
-          dp[i][j] = dp[i - 1][j];
-        } else {
-          dp[i][j] = dp[i - 1][j] || dp[i - 1][j - nums[i]];
+      for (int i = 1; i < nums.length + 1; i++) {
+        for (int j = 0; j <= target; j++) {
+          if (j < nums[i - 1]) {
+            dp[i][j] = dp[i - 1][j];
+          } else {
+            dp[i][j] = dp[i - 1][j] || dp[i - 1][j - nums[i - 1]];
+          }
         }
       }
+
+      for (int i = 0; i < nums.length + 1; i++) {
+        System.out.println(Arrays.toString(dp[i]));
+      }
+
+      return dp[nums.length][target];
     }
 
-    for (int i = 0; i < nums.length; i++) {
-      System.out.println(Arrays.toString(dp[i]));
-    }
-
-    return dp[nums.length - 1][target];
   }
 
-}
 
 }

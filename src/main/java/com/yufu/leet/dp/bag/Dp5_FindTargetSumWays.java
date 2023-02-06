@@ -12,14 +12,12 @@ import java.util.Arrays;
  * <p>
  * 输入：nums: [1, 1, 1, 1, 1], S: 3 输出：5
  */
-public class FindTargetSumWays {
+public class Dp5_FindTargetSumWays {
 
   public static void main(String[] args) {
     int[] nums = {1, 1, 1, 1, 1};
     int S = 3;
-
-    new Solution().findTargetSumWays(nums, S);
-
+    System.out.println(new Solution().findTargetSumWays(nums, S));
   }
 
   static class Solution {
@@ -30,14 +28,18 @@ public class FindTargetSumWays {
      * <p>
      * 问题转为从nums中选取若干个数，使其和为 left 的数量。
      * <p>
-     * dp[i][j] 表示从nums 的[0-i]的下标中选取若干个数，使其和为j的数量 0<=i< n =nums.lenght 0<=j< left+1;
+     * dp[i][j] 表示从nums 的前i个下标中选取若干个数，使其和为j的数量 0<=i< nums.lenght+1  0<=j< left+1;
      * <p>
-     * 问题转化为 求 dp[n-1][left]
+     * 问题转化为 求 dp[nums.lenght][left]
      * <p>
-     * dp[i][j] = dp[i-1][j]                       j < nums[i]
+     * dp[i][j] = dp[i-1][j]                       j < nums[i-1]
      * <p></>
-     * dp[i][j] = dp[i-1][j] + dp[i-1][j-nums[i]]  j>=nums[i]
+     * dp[i][j] = dp[i-1][j] + dp[i-1][j-nums[i-1]]  j>=nums[i-1]
      * <p></>
+     * <p>
+     * dp[0][0]=1,
+     * <p></>
+     * dp[0][j]=0 j>0
      *
      * @param nums
      * @param s
@@ -49,42 +51,36 @@ public class FindTargetSumWays {
         sum = sum + nums[i];
       }
 
-      if ((sum + s) % 2 != 0) {
+      if ((sum - s) % 2 != 0 || (sum - s) < 0) {
         return 0;
       }
 
-      int target = (sum + s) / 2;
+      int target = (sum - s) / 2;
 
-      int[][] dp = new int[nums.length][target + 1];
+      int[][] dp = new int[nums.length + 1][target + 1];
 
-      for (int i = 0; i < nums.length; i++) {
-        dp[i][0] = 1;
+      dp[0][0] = 1;
+      for (int j = 1; j < target + 1; j++) {
+        dp[0][j] = 0;
       }
 
-      for (int j = 1; j <= target; j++) {
-        if (j == nums[0]) {
-          dp[0][j] = 1;
-        } else {
-          dp[0][j] = 0;
-        }
-      }
-
-      for (int i = 1; i < nums.length; i++) {
-        for (int j = 1; j <= target; j++) {
-          if (j < nums[i]) {
+      for (int i = 1; i < nums.length + 1; i++) {
+        for (int j = 0; j <= target; j++) {
+          if (j < nums[i - 1]) {
             dp[i][j] = dp[i - 1][j];
           } else {
-            dp[i][j] = dp[i - 1][j] + dp[i - 1][j - nums[i]];
+            dp[i][j] = dp[i - 1][j] + dp[i - 1][j - nums[i - 1]];
           }
         }
       }
 
-      for (int i = 0; i < nums.length; i++) {
+      for (int i = 0; i < nums.length + 1; i++) {
         System.out.println(Arrays.toString(dp[i]));
       }
 
-      return dp[nums.length - 1][target];
+      return dp[nums.length][target];
     }
+
   }
 
 }
